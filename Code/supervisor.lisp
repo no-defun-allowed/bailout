@@ -35,7 +35,7 @@
        try-again
          (let ((options (options incident)))
            (destructuring-bind (function . recovery)
-               (next-recovery problem)
+               (next-recovery problem incident)
              (format *debug-io* "Attempting ~s to recover from ~s (in ~s)~%"
                      (name recovery) incident problem)
              (handler-case (funcall function options)

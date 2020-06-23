@@ -9,6 +9,8 @@
                :reader job)
    (recoveries :accessor %recoveries
                :reader recoveries)
+   (attempted-recoveries :accessor %attempted-recoveries
+                         :reader attempted-recoveries)
    (supervisor :initarg :supervisor
                :initform (alexandria:required-argument :supervisor)
                :reader supervisor)))
@@ -25,22 +27,29 @@
     (push incident (%incidents problem))
     t))
 
+(defgeneric problem-from-incident (incident supervisor job))
+
 (defclass error-problem (problem)
   ((condition-type :initarg :type
                    :reader condition-type)))
 
-(defgeneric problem-from-incident (incident supervisor job)
-  (:method ((incident error-signalled) supervisor job)
-    (make-instance 'error-problem
-                   :type (type-of (error-signalled incident))
-                   :job job
-                   :supervisor supervisor)))
+(defmethod incident-related-p ((problem error-problem) (incident error-signalled))
+  (equal (type-of (error-signalled incident))
+         (condition-type problem)))
+ 
+(defmethod problem-from-incident ((incident error-signalled) supervisor job)
+  (make-instance 'error-problem
+   :type (type-of (error-signalled incident))
+   :job job
+   :supervisor supervisor))
 
 (define-condition out-of-recoveries (error)
   ((problem :initarg :problem)))
 
-(defgeneric next-recovery (problem)
-  (:method ((problem problem))
+(defgeneric next-recovery (problem incident)
+  (:method ((problem problem) incident)
     (if (null (recoveries problem))
         (error 'out-of-recoveries :problem problem)
-        (pop (%recoveries problem)))))
+        (let ((recovery (pop (%recoveries problem))))
+          (push (list incident recovery) (%attempted-recoveries problem))
+          recovery))))

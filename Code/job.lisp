@@ -72,9 +72,10 @@
   (:method ((job job))
     (when (null (thread job))
       (error "The job has already been stopped."))
-    (bt:interrupt-thread (thread job)
-                         (lambda ()
-                           (throw 'out nil)))
+    (ignore-errors
+     (bt:interrupt-thread (thread job)
+                          (lambda ()
+                            (throw 'out nil))))
     (setf (%thread job) nil)))
 
 (defgeneric send-option (job option)
