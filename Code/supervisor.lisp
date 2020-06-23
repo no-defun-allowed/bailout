@@ -9,7 +9,8 @@
                     :reader incident-mailbox)
    (problems :initform '()
              :reader problems
-             :accessor %problems)))
+             :accessor %problems))
+  (:documentation "A supervisor that supervises its jobs. A supervisor is also a job, so it can be used to form 'supervisor trees', where supervisors supervise other supervisor trees."))
 
 (defmethod stop-job :after ((supervisor supervisor))
   (mapc #'stop-job (jobs supervisor)))

@@ -10,13 +10,17 @@
                :initform nil
                :type (or null bt:thread)
                :accessor %thread)
+   (incidents  :initform 0
+               :accessor %incidents
+               :reader incidents)
    (response-mailbox
     :initform (safe-queue:make-mailbox :name "Response mailbox")
     :reader response-mailbox)
    (associated-states :initarg :associated-states
                       :initform '()
                       :type list
-                      :reader associated-states)))
+                      :reader associated-states))
+  (:documentation "A representation of a task, which is nominally supervised by a supervisor."))
 
 (defgeneric job-error-handler (job
                                &key restart-continuation exit-continuation
@@ -57,7 +61,8 @@
                 (return))))))))
 
 (defclass function-job (job)
-  ((function :initarg :function :reader job-function)))
+  ((function :initarg :function :reader job-function))
+  (:documentation "A job with a function as its work."))
 
 (defgeneric run-job (job)
   (:method ((job function-job))

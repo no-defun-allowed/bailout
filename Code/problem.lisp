@@ -13,7 +13,8 @@
                          :reader attempted-recoveries)
    (supervisor :initarg :supervisor
                :initform (alexandria:required-argument :supervisor)
-               :reader supervisor)))
+               :reader supervisor))
+  (:documentation "An aggregation of incidents, which a supervisor tries to alleviate.")) 
 
 (defmethod initialize-instance :after ((problem problem) &key)
   (setf (%recoveries problem) (compute-recoveries problem)))
@@ -24,24 +25,11 @@
 
 (defgeneric add-incident (problem incident)
   (:method ((problem problem) incident)
+    (incf (%incidents (job incident)))
     (push incident (%incidents problem))
     t))
 
 (defgeneric problem-from-incident (incident supervisor job))
-
-(defclass error-problem (problem)
-  ((condition-type :initarg :type
-                   :reader condition-type)))
-
-(defmethod incident-related-p ((problem error-problem) (incident error-signalled))
-  (equal (type-of (error-signalled incident))
-         (condition-type problem)))
- 
-(defmethod problem-from-incident ((incident error-signalled) supervisor job)
-  (make-instance 'error-problem
-   :type (type-of (error-signalled incident))
-   :job job
-   :supervisor supervisor))
 
 (define-condition out-of-recoveries (error)
   ((problem :initarg :problem)))

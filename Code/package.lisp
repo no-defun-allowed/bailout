@@ -4,4 +4,5 @@
            #:start-job #:stop-job
            #:add-job #:remove-job
            #:define-recovery #:not-applicable
-           #:problem #:incident #:recovery #:incident #:state))
+           #:problem #:incident #:recovery #:incident #:state
+           #:write-supervisor-tree))

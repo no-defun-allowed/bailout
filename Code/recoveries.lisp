@@ -9,7 +9,8 @@
          :reader name)
    (priority :initarg :priority
              :type integer
-             :reader priority)))
+             :reader priority))
+  (:documentation "A strategy a supervisor uses, in order to alleviate its jobs of a problem."))
 
 (defmethod print-object ((recovery recovery) stream)
   (print-unreadable-object (recovery stream :type t :identity t)
